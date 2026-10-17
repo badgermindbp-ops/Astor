@@ -103,8 +103,11 @@
   // Where each stage of the animation starts, as a share of the scroll.
   const STEPS = [0, 0.33, 0.5, 0.7];
 
+  const hook = $("#hook"), hudWrap = $(".hud-wrap");
   let cw = 0, ch = 0, dpr = 1;
   let target = 0, current = 0, lastDrawn = -1;
+  // Free space for the subject, measured around the hook text and the stage readout.
+  let room = { x0: 0, x1: 0, y0: 0, y1: 0 };
 
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -113,6 +116,11 @@
     canvas.height = Math.round(ch * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.imageSmoothingQuality = "high";
+    const box = canvas.getBoundingClientRect(), h = hook.getBoundingClientRect(), hud = hudWrap.getBoundingClientRect();
+    const bottom = hud.top - box.top - 8;
+    room = cw / ch > 1
+      ? { x0: h.right - box.left + cw * 0.03, x1: cw * 0.98, y0: 72, y1: bottom }   // beside the words
+      : { x0: 0, x1: cw, y0: h.bottom - box.top + 4, y1: bottom };                // below the words
     lastDrawn = -1;
   }
 
@@ -125,15 +133,24 @@
     return null;
   }
 
-  // Studio backdrop matching the frames' grey cyclorama, used where the frame
-  // doesn't reach the edge of the window.
+  // Studio backdrop matching the frames' grey cyclorama; the frame melts into it.
   function paintBackdrop() {
     const g = ctx.createLinearGradient(0, 0, 0, ch);
-    g.addColorStop(0, "#4e4f50"); g.addColorStop(0.62, "#727373"); g.addColorStop(1, "#666767");
+    g.addColorStop(0, "#4b4c4d"); g.addColorStop(0.6, "#6a6b6b"); g.addColorStop(1, "#707171");
     ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
-    const r = ctx.createRadialGradient(cw / 2, ch * 0.45, 0, cw / 2, ch * 0.45, Math.max(cw, ch) * 0.6);
-    r.addColorStop(0, "rgba(140,141,141,.55)"); r.addColorStop(1, "rgba(140,141,141,0)");
+    const r = ctx.createRadialGradient(cw * 0.62, ch * 0.5, 0, cw * 0.62, ch * 0.5, Math.max(cw, ch) * 0.65);
+    r.addColorStop(0, "rgba(138,139,139,.5)"); r.addColorStop(1, "rgba(138,139,139,0)");
     ctx.fillStyle = r; ctx.fillRect(0, 0, cw, ch);
+  }
+
+  // Alpha ramp across one axis: fade in over `a` (0..1 of length) at the start, out over `b` at the end.
+  function ramp(len, a, b, vertical) {
+    const g = vertical ? bctx.createLinearGradient(0, 0, 0, len) : bctx.createLinearGradient(0, 0, len, 0);
+    g.addColorStop(0, a ? "rgba(0,0,0,0)" : "#000");
+    if (a) g.addColorStop(a, "#000");
+    if (b) g.addColorStop(1 - b, "#000");
+    g.addColorStop(1, b ? "rgba(0,0,0,0)" : "#000");
+    return g;
   }
 
   function draw(index) {
@@ -141,34 +158,28 @@
     if (!img) return;
     const iw = img.naturalWidth, ih = img.naturalHeight;
     const p = index / (FRAME_COUNT - 1);
-    const narrow = cw / ch < 1.2;
-    // Fit the frame's height to the window; on wide screens the sides are
-    // extended with the backdrop, on narrow ones the frame is cropped around the subject.
-    const scale = (ch / ih) * (narrow ? 0.82 : 1.04);
+    // Subject box in frame space (dentist to tooth, tooth tip to feet). It tightens
+    // as the tooth starts to shine, so the camera eases in for the finale.
+    const z = smooth(0.62, 0.85, p);
+    const sx0 = 0.29 - 0.02 * z, sx1 = 0.85 - 0.14 * z, sy0 = 0.1, sy1 = 0.93;
+    const rw = Math.max(room.x1 - room.x0, 1), rh = Math.max(room.y1 - room.y0, 1);
+    const scale = Math.min(rw / ((sx1 - sx0) * iw), rh / ((sy1 - sy0) * ih));
     const dw = iw * scale, dh = ih * scale;
-    // The subject drifts left as the dentist steps back to admire the tooth.
-    const focal = 0.55 - 0.07 * smooth(0.55, 0.75, p);
-    const dx = dw > cw ? clamp(cw / 2 - focal * dw, cw - dw, 0) : (cw - dw) / 2;
-    const dy = (ch - dh) / 2;
+    const dx = room.x0 + (rw - (sx1 - sx0) * dw) / 2 - sx0 * dw;
+    const dy = room.y0 + (rh - (sy1 - sy0) * dh) / 2 - sy0 * dh;
 
     paintBackdrop();
-    // Feather the frame's edges where it meets the backdrop.
+    // Feather every frame edge that lands inside the screen, so there is no seam.
     const bw = Math.round(dw * dpr), bh = Math.round(dh * dpr);
     if (buf.width !== bw || buf.height !== bh) { buf.width = bw; buf.height = bh; }
     bctx.globalCompositeOperation = "source-over";
     bctx.clearRect(0, 0, bw, bh);
     bctx.drawImage(img, 0, 0, bw, bh);
     bctx.globalCompositeOperation = "destination-in";
-    if (dw < cw) {
-      const f = 0.14, g = bctx.createLinearGradient(0, 0, bw, 0);
-      g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(f, "#000"); g.addColorStop(1 - f, "#000"); g.addColorStop(1, "rgba(0,0,0,0)");
-      bctx.fillStyle = g; bctx.fillRect(0, 0, bw, bh);
-    }
-    if (dh < ch) {
-      const f = 0.12, g = bctx.createLinearGradient(0, 0, 0, bh);
-      g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(f, "#000"); g.addColorStop(1 - f, "#000"); g.addColorStop(1, "rgba(0,0,0,0)");
-      bctx.fillStyle = g; bctx.fillRect(0, 0, bw, bh);
-    }
+    const fl = dx > 0 ? 0.16 : 0, fr = dx + dw < cw ? 0.16 : 0;
+    const ft = dy > 0 ? 0.14 : 0, fb = dy + dh < ch ? 0.12 : 0;
+    if (fl || fr) { bctx.fillStyle = ramp(bw, fl, fr, false); bctx.fillRect(0, 0, bw, bh); }
+    if (ft || fb) { bctx.fillStyle = ramp(bh, ft, fb, true); bctx.fillRect(0, 0, bw, bh); }
     ctx.drawImage(buf, dx, dy, dw, dh);
   }
 
@@ -238,14 +249,20 @@
 
   resize();
   window.addEventListener("resize", resize);
+  // The hook's size changes once the display font arrives; re-measure the free space then.
+  if (document.fonts) document.fonts.ready.then(resize);
   loadFrames();
   requestAnimationFrame(tick);
 
   /* ------------------------------------------------------------------ *
-   * Nav: hairline once the page moves
+   * Nav: see-through over the scene, solid after it
    * ------------------------------------------------------------------ */
   const nav = $("#nav");
-  const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 8);
+  const onScroll = () => {
+    const overHero = window.scrollY < hero.offsetTop + hero.offsetHeight - window.innerHeight * 1.05;
+    nav.classList.toggle("on-hero", overHero);
+    nav.classList.toggle("scrolled", !overHero);
+  };
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 

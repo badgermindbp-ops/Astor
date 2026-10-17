@@ -1,14 +1,14 @@
 # Aster Dental Studio — website prototype
 
-A static, single-page dental clinic website for Chennai with a scroll-driven
-exploded-view animation at the top of the page.
+A static, single-page dental clinic website for Chennai. At the top, a short hook
+sits above a scroll-driven animation of a tiny dentist polishing a giant tooth.
 
 ## What's inside
 
 - `index.html` — page markup
 - `styles.css` — layout, theme (light/dark) and animations
 - `script.js` — scroll-scrubbed canvas animation, services, reviews, booking form, clinic locations
-- `frames/` — 192 WebP frames of the exploded-view animation
+- `frames/` — 240 WebP frames of the hero animation
 
 No build step or dependencies. Open `index.html` through any static web server, for example:
 
@@ -21,9 +21,9 @@ python3 -m http.server 8000
 
 ## Features
 
-- Split hero: animation framed on the left, text on the right; scrolling scrubs through the frames
-- Services with filters and starting prices, plus a comparison table against a typical clinic
-- Patient reviews marquee
+- Hero: one-line hook on top, animation in its own window below (no text over it); scrolling scrubs through the frames with stage labels (Scaling, Inspection, Polishing, Shine)
+- Treatment menu with filters and starting prices (tapping a treatment pre-fills the booking form), plus a comparison table against a typical clinic
+- Rotating featured review and a scrolling row of patient reviews
 - Appointment form with validation and a pre-filled WhatsApp hand-off
 - Floating WhatsApp booking button
 - Two clinic locations (Anna Nagar, Velachery) with hours, open-now status and Google Maps embeds

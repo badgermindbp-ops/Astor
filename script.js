@@ -5,7 +5,7 @@
    * Config — swap these for the real clinic before launch
    * ------------------------------------------------------------------ */
   const WHATSAPP_NUMBER = "919840012345"; // country code + number, digits only
-  const FRAME_COUNT = 192;
+  const FRAME_COUNT = 240;
   const framePath = (i) => `frames/frame-${String(i + 1).padStart(4, "0")}.webp`;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -18,37 +18,21 @@
   /* ------------------------------------------------------------------ *
    * Data
    * ------------------------------------------------------------------ */
-  const ICONS = {
-    scan: '<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M8 12h8"/>',
-    root: '<path d="M8 3c-2.2 0-3.5 1.7-3.5 4 0 3 1.7 4.5 2.3 8 .4 2.8.9 6 2.2 6 1.6 0 1.3-5 3-5s1.4 5 3 5c1.3 0 1.8-3.2 2.2-6 .6-3.5 2.3-5 2.3-8 0-2.3-1.3-4-3.5-4-1.7 0-2.6 1-4 1S9.7 3 8 3Z"/><path d="M12 7v7"/>',
-    fill: '<path d="M8 3c-2.2 0-3.5 1.7-3.5 4 0 3 1.7 4.5 2.3 8 .4 2.8.9 6 2.2 6 1.6 0 1.3-5 3-5s1.4 5 3 5c1.3 0 1.8-3.2 2.2-6 .6-3.5 2.3-5 2.3-8 0-2.3-1.3-4-3.5-4-1.7 0-2.6 1-4 1S9.7 3 8 3Z"/><circle cx="12" cy="9" r="2"/>',
-    gum: '<path d="M3 9c3 2 6 3 9 3s6-1 9-3"/><path d="M6 11v4a2 2 0 0 0 4 0v-3M14 12v3a2 2 0 0 0 4 0v-4"/>',
-    crown: '<path d="M4 9l3 3 5-6 5 6 3-3-2 10H6L4 9Z"/>',
-    spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
-    smile: '<circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.5 2.3 2.2 4 2.2s3-.7 4-2.2M9 9.5h.01M15 9.5h.01"/>',
-    aligner: '<path d="M3 10c0-2 2-4 4.5-4h9C19 6 21 8 21 10c0 4-4 8-9 8s-9-4-9-8Z"/><path d="M7 10h10"/>',
-    braces: '<path d="M3 12h18"/><rect x="5" y="9" width="3" height="6" rx="1"/><rect x="10.5" y="9" width="3" height="6" rx="1"/><rect x="16" y="9" width="3" height="6" rx="1"/>',
-    implant: '<path d="M8 3h8l-1 5H9L8 3Z"/><path d="M9 8h6M10 11h4M10 14h4M11 17h2M12 17v4"/>',
-    wisdom: '<path d="M8 3c-2.2 0-3.5 1.7-3.5 4 0 3 1.7 4.5 2.3 8 .4 2.8.9 6 2.2 6 1.6 0 1.3-5 3-5s1.4 5 3 5c1.3 0 1.8-3.2 2.2-6 .6-3.5 2.3-5 2.3-8 0-2.3-1.3-4-3.5-4-1.7 0-2.6 1-4 1S9.7 3 8 3Z"/><path d="M17 2l4 4"/>',
-    kids: '<circle cx="12" cy="8" r="4"/><path d="M5 21c.8-3.8 3.6-6 7-6s6.2 2.2 7 6"/><path d="M10.5 8h.01M13.5 8h.01"/>'
-  };
-  const icon = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
-
   // Service mix drawn from what Chennai's top chains and independent clinics lead with,
   // plus the gaps patients complain about (sittings, transparency, warranty).
   const SERVICES = [
-    { cat: "general", label: "General", icon: "scan", name: "Check-up & cleaning", desc: "Full exam, ultrasonic scaling and polishing with an intraoral camera tour of your teeth.", price: 799, dur: "45 min", tag: "Digital X-ray incl." },
-    { cat: "general", label: "General", icon: "root", name: "Single-sitting root canal", desc: "Rotary endodontics with apex locator and local anaesthesia. Most cases finish in one visit.", price: 4500, dur: "60–90 min", tag: "Painless" },
-    { cat: "general", label: "General", icon: "fill", name: "Tooth-coloured fillings", desc: "Light-cured composite fillings shade-matched to your enamel. No silver, no mercury.", price: 1200, dur: "30 min" },
-    { cat: "general", label: "General", icon: "gum", name: "Gum & laser treatment", desc: "Deep cleaning, laser gum therapy and treatment for bleeding gums and bad breath.", price: 2500, dur: "45 min" },
-    { cat: "cosmetic", label: "Cosmetic", icon: "spark", name: "Teeth whitening", desc: "In-clinic whitening that lifts several shades in one session, with sensitivity care.", price: 7999, dur: "60 min" },
-    { cat: "cosmetic", label: "Cosmetic", icon: "smile", name: "Veneers & smile makeover", desc: "Digital smile design lets you preview the result on your own face before we begin.", price: 12000, unit: "/tooth", dur: "2–3 visits", tag: "Preview first" },
-    { cat: "cosmetic", label: "Cosmetic", icon: "crown", name: "Crowns & bridges", desc: "Zirconia and E.max crowns milled for a natural fit, to restore broken or missing teeth.", price: 9000, unit: "/crown", dur: "2 visits" },
-    { cat: "ortho", label: "Orthodontics", icon: "aligner", name: "Clear aligners", desc: "Near-invisible aligners planned on a 3D scan. See your final smile before you start.", price: 65000, dur: "6–18 months", tag: "3D plan" },
-    { cat: "ortho", label: "Orthodontics", icon: "braces", name: "Braces", desc: "Metal, ceramic and self-ligating braces for teens and adults, with monthly reviews.", price: 30000, dur: "12–24 months" },
-    { cat: "surgical", label: "Surgical", icon: "implant", name: "Dental implants", desc: "Titanium implants planned on 3D CBCT, plus implant-supported dentures for full arches.", price: 25000, unit: "/implant", dur: "2–3 visits", tag: "Lifetime warranty" },
-    { cat: "surgical", label: "Surgical", icon: "wisdom", name: "Wisdom tooth removal", desc: "Gentle surgical extraction of impacted wisdom teeth, with a clear aftercare plan.", price: 3500, dur: "45 min" },
-    { cat: "kids", label: "Kids", icon: "kids", name: "Children's dentistry", desc: "Fluoride, sealants and baby-tooth care by a paediatric dentist in a calm, friendly room.", price: 600, dur: "30 min", tag: "Ages 2+" }
+    { cat: "general", label: "General", name: "Check-up & cleaning", desc: "Full exam, ultrasonic scaling and polishing with an intraoral camera tour of your teeth.", price: 799, dur: "45 min", tag: "Digital X-ray incl." },
+    { cat: "general", label: "General", name: "Single-sitting root canal", desc: "Rotary endodontics with apex locator and local anaesthesia. Most cases finish in one visit.", price: 4500, dur: "60–90 min", tag: "Painless" },
+    { cat: "general", label: "General", name: "Tooth-coloured fillings", desc: "Light-cured composite fillings shade-matched to your enamel. No silver, no mercury.", price: 1200, dur: "30 min" },
+    { cat: "general", label: "General", name: "Gum & laser treatment", desc: "Deep cleaning, laser gum therapy and treatment for bleeding gums and bad breath.", price: 2500, dur: "45 min" },
+    { cat: "cosmetic", label: "Cosmetic", name: "Teeth whitening", desc: "In-clinic whitening that lifts several shades in one session, with sensitivity care.", price: 7999, dur: "60 min" },
+    { cat: "cosmetic", label: "Cosmetic", name: "Veneers & smile makeover", desc: "Digital smile design lets you preview the result on your own face before we begin.", price: 12000, unit: "/tooth", dur: "2–3 visits", tag: "Preview first" },
+    { cat: "cosmetic", label: "Cosmetic", name: "Crowns & bridges", desc: "Zirconia and E.max crowns milled for a natural fit, to restore broken or missing teeth.", price: 9000, unit: "/crown", dur: "2 visits" },
+    { cat: "ortho", label: "Orthodontics", name: "Clear aligners", desc: "Near-invisible aligners planned on a 3D scan. See your final smile before you start.", price: 65000, dur: "6–18 months", tag: "3D plan" },
+    { cat: "ortho", label: "Orthodontics", name: "Braces", desc: "Metal, ceramic and self-ligating braces for teens and adults, with monthly reviews.", price: 30000, dur: "12–24 months" },
+    { cat: "surgical", label: "Surgical", name: "Dental implants", desc: "Titanium implants planned on 3D CBCT, plus implant-supported dentures for full arches.", price: 25000, unit: "/implant", dur: "2–3 visits", tag: "Lifetime warranty" },
+    { cat: "surgical", label: "Surgical", name: "Wisdom tooth removal", desc: "Gentle surgical extraction of impacted wisdom teeth, with a clear aftercare plan.", price: 3500, dur: "45 min" },
+    { cat: "kids", label: "Kids", name: "Children's dentistry", desc: "Fluoride, sealants and baby-tooth care by a paediatric dentist in a calm, friendly room.", price: 600, dur: "30 min", tag: "Ages 2+" }
   ];
 
   const COMPARE = [
@@ -106,16 +90,18 @@
   setTimeout(() => { waFloat.classList.add("peek"); setTimeout(() => waFloat.classList.remove("peek"), 4000); }, 6000);
 
   /* ------------------------------------------------------------------ *
-   * Scroll-scrubbed hero
+   * Scroll-scrubbed hero: the canvas lives in the stage window below the hook
    * ------------------------------------------------------------------ */
   const hero = $("#hero");
   const canvas = $("#heroCanvas");
   const ctx = canvas.getContext("2d", { alpha: false });
+  const buf = document.createElement("canvas");
+  const bctx = buf.getContext("2d");
   const frames = new Array(FRAME_COUNT);
-  const chapters = $$(".chapter");
-  const hudBar = $("#hudBar"), hudFrame = $("#hudFrame"), hudSteps = $$("#hudSteps span"), scrollCue = $("#scrollCue");
+  const hudBar = $("#hudBar"), hudFrame = $("#hudFrame"), hudSteps = $$("#hudSteps li"), scrollCue = $("#scrollCue");
   const loader = $("#loader"), loaderBar = $("#loaderBar"), loaderNum = $("#loaderNum");
-  const BG = "#46494b";
+  // Where each stage of the animation starts, as a share of the scroll.
+  const STEPS = [0, 0.33, 0.5, 0.7];
 
   let cw = 0, ch = 0, dpr = 1;
   let target = 0, current = 0, lastDrawn = -1;
@@ -139,18 +125,15 @@
     return null;
   }
 
-  // Must match the split-layout media query in styles.css.
-  const splitLayout = window.matchMedia("(min-aspect-ratio: 9/10) and (min-width: 860px)");
-
-  // Soften the frame's top and bottom edges into the panel background.
-  function feather(dy, dh) {
-    const fade = dh * 0.2;
-    let g = ctx.createLinearGradient(0, dy, 0, dy + fade);
-    g.addColorStop(0, BG); g.addColorStop(1, "rgba(70,73,75,0)");
-    ctx.fillStyle = g; ctx.fillRect(0, dy - 1, cw, fade + 1);
-    g = ctx.createLinearGradient(0, dy + dh - fade, 0, dy + dh);
-    g.addColorStop(0, "rgba(70,73,75,0)"); g.addColorStop(1, BG);
-    ctx.fillStyle = g; ctx.fillRect(0, dy + dh - fade, cw, fade + 1);
+  // Studio backdrop matching the frames' grey cyclorama, used where the frame
+  // doesn't reach the edge of the window.
+  function paintBackdrop() {
+    const g = ctx.createLinearGradient(0, 0, 0, ch);
+    g.addColorStop(0, "#4e4f50"); g.addColorStop(0.62, "#727373"); g.addColorStop(1, "#666767");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
+    const r = ctx.createRadialGradient(cw / 2, ch * 0.45, 0, cw / 2, ch * 0.45, Math.max(cw, ch) * 0.6);
+    r.addColorStop(0, "rgba(140,141,141,.55)"); r.addColorStop(1, "rgba(140,141,141,0)");
+    ctx.fillStyle = r; ctx.fillRect(0, 0, cw, ch);
   }
 
   function draw(index) {
@@ -158,24 +141,35 @@
     if (!img) return;
     const iw = img.naturalWidth, ih = img.naturalHeight;
     const p = index / (FRAME_COUNT - 1);
-    // Focal point drifts from the chair (left) toward the cabinetry (right) as the scene explodes.
-    const focal = 0.42 + 0.18 * smooth(0.55, 0.9, p);
-    let scale, dy;
-    ctx.fillStyle = BG;
-    ctx.fillRect(0, 0, cw, ch);
-    if (splitLayout.matches) {
-      // Desktop: the canvas is the framed left panel. Fill its width, keep most of the scene visible.
-      scale = Math.max(cw / iw, (ch * 0.8) / ih);
-      dy = (ch - ih * scale) / 2;
-    } else {
-      // Phones: show more of the scene, park it in the upper half, copy sits below.
-      scale = (cw * 1.75) / iw;
-      dy = ch * 0.3 - (ih * scale) / 2;
-    }
+    const narrow = cw / ch < 1.2;
+    // Fit the frame's height to the window; on wide screens the sides are
+    // extended with the backdrop, on narrow ones the frame is cropped around the subject.
+    const scale = (ch / ih) * (narrow ? 0.82 : 1.04);
     const dw = iw * scale, dh = ih * scale;
-    const dx = clamp(cw / 2 - focal * dw, cw - dw, 0);
-    ctx.drawImage(img, dx, dy, dw, dh);
-    if (dh < ch + 1) feather(dy, dh);
+    // The subject drifts left as the dentist steps back to admire the tooth.
+    const focal = 0.55 - 0.07 * smooth(0.55, 0.75, p);
+    const dx = dw > cw ? clamp(cw / 2 - focal * dw, cw - dw, 0) : (cw - dw) / 2;
+    const dy = (ch - dh) / 2;
+
+    paintBackdrop();
+    // Feather the frame's edges where it meets the backdrop.
+    const bw = Math.round(dw * dpr), bh = Math.round(dh * dpr);
+    if (buf.width !== bw || buf.height !== bh) { buf.width = bw; buf.height = bh; }
+    bctx.globalCompositeOperation = "source-over";
+    bctx.clearRect(0, 0, bw, bh);
+    bctx.drawImage(img, 0, 0, bw, bh);
+    bctx.globalCompositeOperation = "destination-in";
+    if (dw < cw) {
+      const f = 0.14, g = bctx.createLinearGradient(0, 0, bw, 0);
+      g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(f, "#000"); g.addColorStop(1 - f, "#000"); g.addColorStop(1, "rgba(0,0,0,0)");
+      bctx.fillStyle = g; bctx.fillRect(0, 0, bw, bh);
+    }
+    if (dh < ch) {
+      const f = 0.12, g = bctx.createLinearGradient(0, 0, 0, bh);
+      g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(f, "#000"); g.addColorStop(1 - f, "#000"); g.addColorStop(1, "rgba(0,0,0,0)");
+      bctx.fillStyle = g; bctx.fillRect(0, 0, bw, bh);
+    }
+    ctx.drawImage(buf, dx, dy, dw, dh);
   }
 
   function heroProgress() {
@@ -183,19 +177,9 @@
     return total > 0 ? clamp(-hero.getBoundingClientRect().top / total) : 0;
   }
 
-  function updateChapters(p) {
-    const fade = 0.045;
-    chapters.forEach((el, idx) => {
-      const a = +el.dataset.from, b = +el.dataset.to;
-      const fadeIn = idx === 0 ? 1 : smooth(a, a + fade, p);
-      const fadeOut = 1 - smooth(b - fade, b, p);
-      const o = Math.min(fadeIn, fadeOut);
-      const dir = p < a + fade ? 1 : -1; // enter from below, leave upward
-      el.style.opacity = o.toFixed(3);
-      el.style.setProperty("--ty", `${((1 - o) * 36 * dir).toFixed(1)}px`);
-      el.classList.toggle("show", o > 0.01);
-    });
-    const step = p < 0.22 ? 0 : p < 0.54 ? 1 : p < 0.82 ? 2 : 3;
+  function updateHud(p) {
+    let step = 0;
+    STEPS.forEach((s, i) => { if (p >= s) step = i; });
     hudSteps.forEach((s, i) => s.classList.toggle("on", i === step));
     hudBar.style.width = `${(p * 100).toFixed(2)}%`;
     scrollCue.style.opacity = String(1 - smooth(0.02, 0.08, p));
@@ -211,7 +195,7 @@
       lastDrawn = idx;
       hudFrame.textContent = `${String(idx + 1).padStart(3, "0")} / ${FRAME_COUNT}`;
     }
-    updateChapters(current / (FRAME_COUNT - 1));
+    updateHud(current / (FRAME_COUNT - 1));
     requestAnimationFrame(tick);
   }
 
@@ -242,7 +226,7 @@
           loadedCoarse++;
           const pct = Math.round((loadedCoarse / coarseCount) * 100);
           loaderBar.style.width = pct + "%";
-          loaderNum.textContent = `Preparing the operatory · ${pct}%`;
+          loaderNum.textContent = `Loading the studio · ${pct}%`;
           if (loadedCoarse >= coarseCount) finish();
         }
         loadOne();
@@ -258,41 +242,38 @@
   requestAnimationFrame(tick);
 
   /* ------------------------------------------------------------------ *
-   * Nav: transparent over the hero, solid after
+   * Nav: hairline once the page moves
    * ------------------------------------------------------------------ */
   const nav = $("#nav");
-  const onScroll = () => {
-    const heroEnd = hero.offsetTop + hero.offsetHeight - window.innerHeight * 0.6;
-    nav.classList.toggle("solid", window.scrollY > heroEnd);
-  };
+  const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 8);
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
   /* ------------------------------------------------------------------ *
-   * Services + filters
+   * Treatment menu + filters (rows prefill the booking form)
    * ------------------------------------------------------------------ */
-  const grid = $("#servicesGrid");
-  grid.innerHTML = SERVICES.map((s) => `
-    <article class="service reveal" data-cat="${s.cat}">
-      <div class="service-top">
-        <span class="service-icon">${icon(s.icon)}</span>
-        ${s.tag ? `<span class="tag">${s.tag}</span>` : `<span class="service-cat">${s.label}</span>`}
-      </div>
-      <h3>${s.name}</h3>
-      <p>${s.desc}</p>
-      <div class="service-meta"><span class="price">From ${fmtINR(s.price)}${s.unit || ""}</span><span class="dur">${s.dur}</span></div>
-    </article>`).join("");
+  const list = $("#servicesList");
+  list.innerHTML = SERVICES.map((s) => `
+    <li data-cat="${s.cat}">
+      <button class="menu-item" type="button" data-service="${s.name}" aria-label="Book ${s.name}, from ${fmtINR(s.price)}">
+        <span class="menu-name"><h3>${s.name}</h3>${s.tag ? `<span class="menu-tag">${s.tag}</span>` : ""}</span>
+        <span class="menu-price">${fmtINR(s.price)}<small>${s.unit || ""}</small></span>
+        <span class="menu-desc">${s.desc}</span>
+        <span class="menu-meta">${s.label} · ${s.dur}<svg aria-hidden="true"><use href="#i-arrow"/></svg></span>
+      </button>
+    </li>`).join("");
 
   $$("#filters .chip").forEach((chip) => {
     chip.addEventListener("click", () => {
       $$("#filters .chip").forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
       const f = chip.dataset.filter;
-      $$(".service", grid).forEach((card, i) => {
-        const show = f === "all" || card.dataset.cat === f;
-        card.hidden = !show;
+      let n = 0;
+      $$("li", list).forEach((row) => {
+        const show = f === "all" || row.dataset.cat === f;
+        row.hidden = !show;
         if (show && !reduceMotion) {
-          card.animate([{ opacity: 0, transform: "translateY(14px)" }, { opacity: 1, transform: "none" }],
-            { duration: 450, delay: (i % 4) * 50, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" });
+          row.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }],
+            { duration: 420, delay: n++ * 40, easing: "cubic-bezier(.2,.7,.1,1)", fill: "backwards" });
         }
       });
     });
@@ -307,9 +288,30 @@
       <td class="them"><span class="no"><svg><use href="#i-x"/></svg></span>${them}</td></tr>`).join("");
 
   /* ------------------------------------------------------------------ *
-   * Reviews marquee
+   * Reviews: rotating featured quote + marquee
    * ------------------------------------------------------------------ */
-  const HUES = ["#2c5f8e", "#8a5a2b", "#2f7a64", "#7a3f6b", "#5b6b2f", "#9a3b3b"];
+  const FEATURED = REVIEWS.slice(0, 5);
+  const fq = $("#featureQuote"), fqDots = $("#fqDots");
+  let fqIndex = 0, fqTimer = null;
+  fqDots.innerHTML = FEATURED.map((r, i) => `<button type="button" aria-label="Review by ${r.n}" aria-pressed="${i === 0}"></button>`).join("");
+  function showQuote(i, animate = true) {
+    fqIndex = i;
+    const r = FEATURED[i];
+    const apply = () => {
+      $("#fqText").textContent = r.t;
+      $("#fqName").textContent = r.n;
+      $("#fqMeta").textContent = `${r.s} · ${r.a}, Chennai`;
+      fq.classList.remove("swap");
+    };
+    $$("button", fqDots).forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
+    if (animate && !reduceMotion) { fq.classList.add("swap"); setTimeout(apply, 350); } else apply();
+  }
+  const startRotation = () => { clearInterval(fqTimer); if (!reduceMotion) fqTimer = setInterval(() => showQuote((fqIndex + 1) % FEATURED.length), 7000); };
+  $$("button", fqDots).forEach((b, i) => b.addEventListener("click", () => { showQuote(i); startRotation(); }));
+  showQuote(0, false);
+  startRotation();
+
+  const HUES = ["#3a6fbd", "#8a5a2b", "#2f7a64", "#7a3f6b", "#5b6b2f", "#9a3b3b"];
   const reviewCard = (r, i) => `
     <article class="review">
       <div class="review-top"><span class="stars" aria-label="5 out of 5 stars">★★★★★</span><span class="svc">${r.s}</span></div>
@@ -317,13 +319,9 @@
       <footer><span class="avatar" style="background:${HUES[i % HUES.length]}">${r.n.split(" ").map((w) => w[0]).join("").slice(0, 2)}</span>
         <div><b>${r.n}</b><small>${r.a}, Chennai · Google review</small></div></footer>
     </article>`;
-  const half = Math.ceil(REVIEWS.length / 2);
-  const rows = [REVIEWS.slice(0, half), REVIEWS.slice(half)];
-  $("#marquee").innerHTML = rows.map((row, ri) => {
-    const cards = row.map((r, i) => reviewCard(r, i + ri * half)).join("");
-    // duplicated once so the -50% translate loops seamlessly
-    return `<div class="marquee-row${ri ? " rev" : ""}">${cards}<div style="display:contents" aria-hidden="true">${cards}</div></div>`;
-  }).join("");
+  const cards = REVIEWS.map(reviewCard).join("");
+  // duplicated once so the -50% translate loops seamlessly
+  $("#marquee").innerHTML = `<div class="marquee-row">${cards}<div style="display:contents" aria-hidden="true">${cards}</div></div>`;
 
   /* ------------------------------------------------------------------ *
    * Booking form
@@ -333,6 +331,14 @@
   svcSelect.innerHTML = `<option value="">Choose a treatment</option>` +
     SERVICES.map((s) => `<option>${s.name}</option>`).join("") +
     `<option>Dental emergency / pain</option><option>Not sure, need advice</option>`;
+
+  // Tapping a treatment in the menu carries it into the form.
+  $$(".menu-item", list).forEach((btn) => btn.addEventListener("click", () => {
+    svcSelect.value = btn.dataset.service;
+    setErr(svcSelect, "");
+    $("#book").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    setTimeout(() => $("#f-name").focus({ preventScroll: true }), reduceMotion ? 0 : 700);
+  }));
 
   const SLOTS = ["10:00", "11:30", "13:00", "16:00", "17:30", "19:00"];
   const slotWrap = $("#slots");
@@ -417,7 +423,7 @@
         </dl>
         <div class="actions">
           <a class="btn btn-wa" href="${waLink(msg)}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Send on WhatsApp</a>
-          <button class="btn btn-outline" type="button" id="bookAgain">Book another</button>
+          <button class="btn btn-line" type="button" id="bookAgain">Book another</button>
         </div>
       </div>`;
     $("#bookAgain").addEventListener("click", () => location.reload());
@@ -463,7 +469,7 @@
             <div><span>Parking</span><b>${c.parking}</b></div>
           </div>
           <div class="loc-actions">
-            <a class="btn btn-primary" href="${dirUrl}" target="_blank" rel="noopener"><svg><use href="#i-pin"/></svg>Get directions</a>
+            <a class="btn btn-blue" href="${dirUrl}" target="_blank" rel="noopener"><svg><use href="#i-pin"/></svg>Get directions</a>
             <a class="btn btn-wa" href="${waLink(`Hi Aster Dental ${c.name}, I'd like to book an appointment.`)}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>WhatsApp</a>
           </div>
         </div>
